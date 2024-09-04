@@ -17,7 +17,7 @@ def has_jar() -> bool:
 
 def get_jar_artifact_uri() -> str:
     """Retrieve the download url for latest SPARQL Anything release."""
-    return "https://github.com/SPARQL-Anything/sparql.anything/releases/download/0.9.0/sparql-anything-0.9.0.jar"
+    return f"https://download.eccenca.com/cmem-plugin-sparql-anything/sparql-anything-{JAR_VERSION}.jar"
 
 
 def download_sparql_anything() -> None:
