@@ -25,6 +25,7 @@ def download_sparql_anything() -> None:
     path2jar = Path(get_module_path()) / JAR_FILE_NAME
     dl_link = get_jar_artifact_uri()
     request = requests.get(dl_link, stream=True, timeout=10.0)
+    request.raise_for_status()
     with (
         path2jar.open("wb") as jar,
     ):
