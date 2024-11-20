@@ -24,7 +24,7 @@ from cmem_plugin_sparql_anything.constants import (
     DEFAULT_SPARQL,
     POLICY_TEMPLATE,
     QUERY_PARAMETER_DESCRIPTION,
-    SPARQL_ANYTHING_ERROR_PATTERN,
+    SPARQL_ANYTHING_ERROR_PATTERN, DOCUMENTATION,
 )
 from cmem_plugin_sparql_anything.utils import get_path2jar
 
@@ -32,10 +32,8 @@ from cmem_plugin_sparql_anything.utils import get_path2jar
 @Plugin(
     label="SPARQL Anything",
     plugin_id="cmem_plugin_sparql_anything",
-    description="Query file to generate knowledge graph",
-    documentation="""
-this workflow task uses SPARQL Anything to query file to generate knowledge graph
-""",
+    description="Query anything with SPARQL to construct Knowledge Graphs.",
+    documentation=DOCUMENTATION,
     icon=Icon(file_name="logo.svg", package=__package__),
     parameters=[
         PluginParameter(
