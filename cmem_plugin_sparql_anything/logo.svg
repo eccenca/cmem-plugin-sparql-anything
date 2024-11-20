@@ -16,13 +16,6 @@
   -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
    id="Livello_1"
    x="0px"
@@ -33,10 +26,17 @@
    enable-background="new 0 0 595.28 841.89"
    xml:space="preserve"
    sodipodi:docname="logo.svg"
-   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"><metadata
+   inkscape:version="1.1.2 (b8e25be8, 2022-02-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"><metadata
    id="metadata59"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><sodipodi:namedview
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><sodipodi:namedview
    pagecolor="#ffffff"
    bordercolor="#666666"
    borderopacity="1"
@@ -45,17 +45,18 @@
    guidetolerance="10"
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
-   inkscape:window-width="1440"
-   inkscape:window-height="847"
+   inkscape:window-width="1920"
+   inkscape:window-height="1027"
    id="namedview57"
    showgrid="false"
    inkscape:zoom="0.79226501"
-   inkscape:cx="344.34156"
+   inkscape:cx="343.31947"
    inkscape:cy="99.083008"
-   inkscape:window-x="0"
+   inkscape:window-x="1728"
    inkscape:window-y="25"
    inkscape:window-maximized="1"
-   inkscape:current-layer="Livello_1" />
+   inkscape:current-layer="Livello_1"
+   inkscape:pagecheckerboard="0" />
 
 
 
@@ -97,19 +98,21 @@
 </style>
 
 
+
+	
+	
+	
 </defs>
 
-<g
-   id="g48"
-   transform="translate(-26.506282,-167.87312)">
-	<circle
+<circle
    fill="#274597"
-   cx="296.64801"
-   cy="371.28799"
+   cx="270.14172"
+   cy="248.85422"
    r="198.797"
-   id="circle14" />
-	<g
-   id="g24">
+   id="circle14"
+   style="stroke-width:1.0015748;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1;fill-rule:evenodd" /><g
+   id="g24"
+   transform="translate(-26.506282,-122.43378)">
 		<g
    id="g20">
 			<path
@@ -128,9 +131,9 @@
    stroke-miterlimit="10"
    d="m 276.216,272.708 c -3.631,-7.272 -9.918,-9.908 -16.126,-6.823 -4.932,2.45 -9.786,5.065 -14.788,7.364 -3.405,1.565 -4.966,4.121 -4.591,8.494 0.312,3.628 -0.836,6.408 -4.097,7.566 -1.409,0.5 -2.715,1.284 -4.024,2.018 -0.628,0.352 -1.021,0.312 -1.634,-0.348 -4.621,-4.977 -8.982,-5.995 -14.214,-3.371 -11.522,5.781 -22.915,11.838 -34.602,17.268 -7.501,3.485 -12.8,9.221 -16.837,16.71 -7.338,13.613 -12.127,28.676 -16.494,43.271 -0.485,1.96 -0.827,3.284 -1.141,4.62 -0.609,2.6 0.028,4.505 1.941,5.873 1.725,1.233 3.537,1 5.146,-0.702 11.084,-11.725 24.379,-19.825 39.006,-25.682 4.169,-1.669 8.537,-2.823 13.252,-2.649 3.337,0.123 8.045,0.116 10.711,3.082 0.767,0.853 2.556,3.415 3.125,4.051 l 35.913,-19.645 c -1.445,-2.067 -2.929,-4.238 -4.608,-6.236 -0.907,-1.08 -1.615,-1.11 -0.575,-1.561 1.663,-0.722 2.296,-1.15 3.907,-1.986 1.292,-0.67 2.634,-0.633 4.097,-0.069 1.483,0.572 2.749,1.527 3.996,2.611 2.525,2.195 5.088,2.79 7.799,1.386 5.168,-2.677 10.409,-5.209 15.592,-7.857 6.174,-3.154 7.829,-9.784 4.237,-17.103 -4.961,-10.111 -9.96,-20.205 -14.991,-30.282 z"
    id="path22" />
-	</g>
-	<g
-   id="g46">
+	</g><g
+   id="g46"
+   transform="translate(-26.506282,-122.43378)">
 		<path
    fill="#ffffff"
    d="m 381.097,405.349 c -24.225,-65.413 -8.574,-49.759 -73.984,-73.987 65.41,-24.227 49.759,-8.574 73.984,-73.984 24.23,65.411 8.576,49.757 73.987,73.984 -65.411,24.227 -49.757,8.574 -73.987,73.987 z"
@@ -171,27 +174,5 @@
    id="path42" />
 		</g>
 	</g>
-</g>
-<text
-   transform="scale(0.88566358,1.1290969)"
-   id="text54"
-   x="0.90431345"
-   y="426.70471"
-   style="font-size:10.628px;stroke-width:0.885664"><tspan
-     x="0.90431345"
-     y="426.70471"
-     fill="#0c9038"
-     font-family="Darker Grotesque"
-     font-size="81.8267"
-     letter-spacing="1.12922"
-     id="tspan50"
-     style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-size:72.4709px;font-family:'Darker Grotesque';-inkscape-font-specification:'Darker Grotesque, Ultra-Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.7844">SPARQL.</tspan><tspan
-     x="272.66486"
-     y="426.70471"
-     fill="#274597"
-     font-family="'Darker Grotesque'"
-     font-size="81.8267px"
-     letter-spacing="1.12922"
-     id="tspan52"
-     style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-size:72.4709px;font-family:'Darker Grotesque';-inkscape-font-specification:'Darker Grotesque, Ultra-Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.7844">ANYTHING</tspan></text>
+
 </svg>
