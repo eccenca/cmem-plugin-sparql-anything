@@ -1,4 +1,4 @@
-"""sparql-anything - main package"""
+"""cmem-plugin-sparql-anything"""
 
 import logging
 
