@@ -30,7 +30,7 @@ CONSTRUCT { ?s ?p ?o }
 WHERE
 {
   SERVICE <x-sparql-anything:{{resource_file}}> {
-    fx:properties fx:root "https://example.org/graph/" .
+    fx:properties fx:root "https://example.org/document" .
     fx:properties fx:blank-nodes false .
     ?s  ?p  ?o .
   }
