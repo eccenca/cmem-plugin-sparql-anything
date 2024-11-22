@@ -22,9 +22,10 @@ from cmem_plugin_base.dataintegration.utils import setup_cmempy_user_access
 
 from cmem_plugin_sparql_anything.constants import (
     DEFAULT_SPARQL,
+    DOCUMENTATION,
     POLICY_TEMPLATE,
     QUERY_PARAMETER_DESCRIPTION,
-    SPARQL_ANYTHING_ERROR_PATTERN, DOCUMENTATION,
+    SPARQL_ANYTHING_ERROR_PATTERN,
 )
 from cmem_plugin_sparql_anything.utils import get_path2jar
 

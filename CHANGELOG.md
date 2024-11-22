@@ -9,4 +9,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Added
 
 - initial version
+- SPARQL Construct over files
+- direct upload to graphs
 

@@ -50,8 +50,12 @@ For more information about sparql-anything please refer: https://sparql-anything
 
 SPARQL_ANYTHING_ERROR_PATTERN = "io.github.sparqlanything.cli.SPARQLAnything"
 
-DOCUMENTATION = """[SPARQL Anything](https://sparql-anything.cc/) is a system for Semantic Web re-engineering that allows users to ... query anything with SPARQL.
+DOCUMENTATION = """[SPARQL Anything](https://sparql-anything.cc/) is a system for Semantic Web
+re-engineering that allows users to ... query anything with SPARQL.
 
-This workflow task allows for execution of SPARQL queries against the simplistic Facade-X meta-model of SPARQL Anything.
+This workflow task allows for execution of SPARQL queries against the simplistic Facade-X
+meta-model of SPARQL Anything.
 Facade-X provides a homogeneous view over heterogeneous data sources and support multiple formats.
+It allows to extract data from project files by using SPARQL Construct queries.
+In order to reference, the file, you need to use the `{{resource_file}}` placeholder.
 """
