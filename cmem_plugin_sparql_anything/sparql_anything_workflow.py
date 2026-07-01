@@ -86,14 +86,13 @@ class SPARQLAnything(WorkflowPlugin):
         with tempfile.NamedTemporaryFile(delete=True, suffix=self.resource) as resource_file:
             self._download_resource(context.task.project_id(), self.resource, resource_file)  # type: ignore[arg-type]
             self.post_result_to_graph(data=self._run_query(resource_file.name))
-            context.report.update(ExecutionReport(entity_count=1, operation_desc="graph updated"))
+            context.report.update(ExecutionReport(entity_count=1, operation_desc="graph  d"))
 
     def _download_resource(self, project_id: str, resource: str, file: io.StringIO) -> None:
         """Download the resource and writes it to the temporary file."""
         self.log.info("Downloading resource")
         with get_resource_response(project_id, resource) as response:
-            for chunk in response.iter_content(chunk_size=8192):
-                file.write(chunk)
+            file.writelines(response.iter_content(chunk_size=8192))
         file.flush()
 
     def post_result_to_graph(self, data: bytes) -> None:

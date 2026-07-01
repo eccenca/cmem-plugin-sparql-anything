@@ -20,6 +20,7 @@ poetry-dynamic-versioning = "^1.10.0"
 
 [tool.poetry.dependencies]# if you need to change python version here, change it also in .python-version
 python = "^3.13"
+requests = "^2.34.2"
 
 [tool.poetry.dependencies.cmem-plugin-base]
 version = "^4.16.1"
@@ -98,3 +99,7 @@ ignore = [
     "S101",    # use of assert detected
     "TRY003",  # Avoid specifying long messages outside the exception class
 ]
+
+[tool.deptry.per_rule_ignores]
+DEP003 = ["cmem"]
+

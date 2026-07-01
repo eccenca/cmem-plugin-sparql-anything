@@ -10,5 +10,6 @@ try:
     if not utils.has_jar():
         utils.download_sparql_anything()
 except requests.exceptions.RequestException:
-    logging.info("Failed to download sparql anything zip file")
+    logger = logging.getLogger(__name__)
+    logger.info("Failed to download sparql anything zip file")
     raise

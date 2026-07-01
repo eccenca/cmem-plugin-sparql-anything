@@ -1,6 +1,7 @@
 """Plugin tests."""
 
 import io
+import os
 from collections.abc import Generator
 from dataclasses import dataclass
 
@@ -11,9 +12,13 @@ from cmem.cmempy.workspace.projects.project import delete_project, make_new_proj
 from cmem.cmempy.workspace.projects.resources.resource import (
     create_resource,
 )
+from cmem_plugin_base.testing import TestExecutionContext
 
 from cmem_plugin_sparql_anything.sparql_anything_workflow import SPARQLAnything
-from tests.utils import TestExecutionContext, needs_cmem
+
+needs_cmem = pytest.mark.skipif(
+    os.environ.get("CMEM_BASE_URI", "") == "", reason="Needs CMEM configuration"
+)
 
 PROJECT_NAME = "sparql_anything_test_project"
 DATASET_NAME = "sample_dataset"
@@ -37,7 +42,7 @@ class FixtureEnvironmentData:
 
 
 @pytest.fixture
-def di_environment() -> Generator[FixtureEnvironmentData, None, None]:
+def di_environment() -> Generator[FixtureEnvironmentData]:
     """Provide the DI build project incl. assets."""
     make_new_project(PROJECT_NAME)
     make_new_dataset(

@@ -11,8 +11,8 @@ JAR_FILE_NAME = f"sparql-anything-{JAR_VERSION}.jar"
 
 def has_jar() -> bool:
     """Check the jar has been successfully downloaded in the installation folder."""
-    files = os.listdir(get_module_path())
-    return any(".jar" in file for file in files)
+    files = Path(get_module_path()).iterdir()
+    return any(".jar" in file.name for file in files)
 
 
 def get_jar_artifact_uri() -> str:
