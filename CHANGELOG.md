@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Changed
+
+- replaced the "File" dropdown parameter with a file input port
+
 ### Added
 
 - initial version

@@ -12,6 +12,8 @@ from cmem.cmempy.workspace.projects.project import delete_project, make_new_proj
 from cmem.cmempy.workspace.projects.resources.resource import (
     create_resource,
 )
+from cmem_plugin_base.dataintegration.entity import Entities
+from cmem_plugin_base.dataintegration.typed_entities.file import FileEntitySchema, ProjectFile
 from cmem_plugin_base.testing import TestExecutionContext
 
 from cmem_plugin_sparql_anything.sparql_anything_workflow import SPARQLAnything
@@ -86,7 +88,20 @@ def _triple_count(graph: str) -> int:
 @needs_cmem
 def test_success(di_environment: FixtureEnvironmentData) -> None:
     """Test SPARQLAnything success flow"""
-    SPARQLAnything(di_environment.resource, GRAPH, True).execute(
-        [], TestExecutionContext(project_id=di_environment.project)
+    schema = FileEntitySchema()
+    entity = schema.to_entity(ProjectFile(path=di_environment.resource))
+    input_entities = Entities(entities=iter([entity]), schema=schema)
+
+    SPARQLAnything(GRAPH, True).execute(
+        [input_entities], TestExecutionContext(project_id=di_environment.project)
     )
     assert _triple_count(GRAPH) == 2  # noqa: PLR2004
+
+
+@needs_cmem
+def test_no_input(di_environment: FixtureEnvironmentData) -> None:
+    """Test error when no input file is given"""
+    with pytest.raises(ValueError, match=r"No input file was given\."):
+        SPARQLAnything(GRAPH, True).execute(
+            [], TestExecutionContext(project_id=di_environment.project)
+        )

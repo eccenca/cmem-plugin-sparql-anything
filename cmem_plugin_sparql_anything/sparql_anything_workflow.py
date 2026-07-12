@@ -4,10 +4,11 @@ import io
 import shlex
 import tempfile
 from collections.abc import Sequence
+from pathlib import Path
 from subprocess import CompletedProcess, run
+from typing import IO
 
 from cmem.cmempy.dp.proxy.graph import post_streamed
-from cmem.cmempy.workspace.projects.resources.resource import get_resource_response
 from cmem_plugin_base.dataintegration.context import ExecutionContext, ExecutionReport
 from cmem_plugin_base.dataintegration.description import Icon, Plugin, PluginParameter
 from cmem_plugin_base.dataintegration.entity import (
@@ -15,8 +16,9 @@ from cmem_plugin_base.dataintegration.entity import (
 )
 from cmem_plugin_base.dataintegration.parameter.code import SparqlCode
 from cmem_plugin_base.dataintegration.parameter.graph import GraphParameterType
-from cmem_plugin_base.dataintegration.parameter.resource import ResourceParameterType
 from cmem_plugin_base.dataintegration.plugins import WorkflowPlugin
+from cmem_plugin_base.dataintegration.ports import FixedNumberOfInputs, FixedSchemaPort
+from cmem_plugin_base.dataintegration.typed_entities.file import File, FileEntitySchema
 from cmem_plugin_base.dataintegration.types import BoolParameterType
 from cmem_plugin_base.dataintegration.utils import setup_cmempy_user_access
 
@@ -37,13 +39,6 @@ from cmem_plugin_sparql_anything.utils import get_path2jar
     documentation=DOCUMENTATION,
     icon=Icon(file_name="logo.svg", package=__package__),
     parameters=[
-        PluginParameter(
-            name="resource",
-            label="File",
-            description="Which resource file do you run query on? "
-            "The dropdown shows file resources from the current project.",
-            param_type=ResourceParameterType(),
-        ),
         PluginParameter(name="query", label="Query", description=QUERY_PARAMETER_DESCRIPTION),
         PluginParameter(
             name="graph",
@@ -64,36 +59,48 @@ class SPARQLAnything(WorkflowPlugin):
 
     def __init__(
         self,
-        resource: str,
         graph: str,
         replace_graph: bool = False,
         query: SparqlCode = DEFAULT_SPARQL,
     ) -> None:
-        self.resource = resource
         self.query = str(query)
         self.graph = graph
         self.replace_graph = replace_graph
+        self.input_ports = FixedNumberOfInputs([FixedSchemaPort(schema=FileEntitySchema())])
+        self.output_port = None
 
     def execute(
         self,
-        inputs: Sequence[Entities],  # noqa: ARG002
+        inputs: Sequence[Entities],
         context: ExecutionContext,
     ) -> None:
         """Run the workflow operator."""
         self.log.info("Start querying resource")
         setup_cmempy_user_access(context.user)
 
-        with tempfile.NamedTemporaryFile(delete=True, suffix=self.resource) as resource_file:
-            self._download_resource(context.task.project_id(), self.resource, resource_file)  # type: ignore[arg-type]
+        if len(inputs) == 0:
+            raise ValueError("No input file was given.")
+
+        entities = list(inputs[0].entities)
+        if len(entities) != 1:
+            raise ValueError(
+                f"SPARQL Anything requires exactly one input file, but {len(entities)} were given."
+            )
+
+        file = FileEntitySchema().from_entity(entities[0])
+
+        with tempfile.NamedTemporaryFile(delete=True, suffix=Path(file.path).name) as resource_file:
+            self._download_resource(context.task.project_id(), file, resource_file)
             self.post_result_to_graph(data=self._run_query(resource_file.name))
             context.report.update(ExecutionReport(entity_count=1, operation_desc="graph  d"))
 
-    def _download_resource(self, project_id: str, resource: str, file: io.StringIO) -> None:
+    def _download_resource(self, project_id: str, file: File, target: IO[bytes]) -> None:
         """Download the resource and writes it to the temporary file."""
         self.log.info("Downloading resource")
-        with get_resource_response(project_id, resource) as response:
-            file.writelines(response.iter_content(chunk_size=8192))
-        file.flush()
+        with file.read_stream(project_id) as stream:
+            for chunk in iter(lambda: stream.read(8192), b""):
+                target.write(chunk)
+        target.flush()
 
     def post_result_to_graph(self, data: bytes) -> None:
         """Post result to graph"""
