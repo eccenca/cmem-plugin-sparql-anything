@@ -117,9 +117,9 @@ class SPARQLAnything(WorkflowPlugin):
 
     @staticmethod
     def _parse_triples(data: bytes) -> Iterator[Quad]:
-        """Parse the Turtle output of SPARQL Anything into RDF quads."""
+        """Parse the N-Triples output of SPARQL Anything into RDF quads."""
         rdf_graph = RdfGraph()
-        rdf_graph.parse(data=data, format="turtle")
+        rdf_graph.parse(data=data, format="nt")
         for subject, predicate, rdf_object in rdf_graph:
             yield Quad(
                 subject=cast("ConcreteNode", _to_rdf_node(subject)),
@@ -144,10 +144,13 @@ class SPARQLAnything(WorkflowPlugin):
             )
             query_file.flush()
 
-            # Build command with policy and query file paths
+            # Build command with policy and query file paths, requesting N-Triples output
+            # (a stricter, unambiguous serialization) instead of the default Turtle, since
+            # Jena's Turtle writer can produce prefixed names that rdflib's Turtle parser
+            # rejects (e.g. facade-x predicates derived from arbitrary source field names).
             cmd = (
                 f"java -Djava.security.manager -Djava.security.policy={policy_file.name}"
-                f" -jar {get_path2jar()} -q {query_file.name}"
+                f" -jar {get_path2jar()} -q {query_file.name} -f NT"
             )
             output: CompletedProcess = run(shlex.split(cmd), check=False, capture_output=True)  # noqa: S603
         if SPARQL_ANYTHING_ERROR_PATTERN in output.stderr.decode("utf-8"):
