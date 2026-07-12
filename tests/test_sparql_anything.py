@@ -6,7 +6,6 @@ from collections.abc import Generator
 from dataclasses import dataclass
 
 import pytest
-from cmem.cmempy.queries import SparqlQuery
 from cmem.cmempy.workspace.projects.datasets.dataset import make_new_dataset
 from cmem.cmempy.workspace.projects.project import delete_project, make_new_project
 from cmem.cmempy.workspace.projects.resources.resource import (
@@ -14,6 +13,7 @@ from cmem.cmempy.workspace.projects.resources.resource import (
 )
 from cmem_plugin_base.dataintegration.entity import Entities
 from cmem_plugin_base.dataintegration.typed_entities.file import FileEntitySchema, ProjectFile
+from cmem_plugin_base.dataintegration.typed_entities.quads import QuadEntitySchema
 from cmem_plugin_base.testing import TestExecutionContext
 
 from cmem_plugin_sparql_anything.sparql_anything_workflow import SPARQLAnything
@@ -26,12 +26,6 @@ PROJECT_NAME = "sparql_anything_test_project"
 DATASET_NAME = "sample_dataset"
 RESOURCE_NAME = "sample_dataset.txt"
 DATASET_TYPE = "text"
-GRAPH = "https://example.org/graph/"
-TRIPLE_COUNT_QUERY = """SELECT (COUNT(*) as ?Triples)
-WHERE
-  { GRAPH <{{graph}}>
-      { ?s ?p ?o }
-  }"""
 
 
 @dataclass
@@ -66,25 +60,6 @@ def di_environment() -> Generator[FixtureEnvironmentData]:
     delete_project(PROJECT_NAME)
 
 
-def _triple_count(graph: str) -> int:
-    """Count the no of triple in graph"""
-    query = SparqlQuery(
-        TRIPLE_COUNT_QUERY,
-        label="query from string to get triples count metadata",
-        origin="unknown",
-        placeholder={
-            "graph": graph,
-        },
-    )
-    result = query.get_json_results(
-        placeholder={
-            "graph": graph,
-        }
-    )
-    count = result["results"]["bindings"][0]["Triples"]["value"]
-    return int(count)
-
-
 @needs_cmem
 def test_success(di_environment: FixtureEnvironmentData) -> None:
     """Test SPARQLAnything success flow"""
@@ -92,16 +67,15 @@ def test_success(di_environment: FixtureEnvironmentData) -> None:
     entity = schema.to_entity(ProjectFile(path=di_environment.resource))
     input_entities = Entities(entities=iter([entity]), schema=schema)
 
-    SPARQLAnything(GRAPH, True).execute(
+    output = SPARQLAnything().execute(
         [input_entities], TestExecutionContext(project_id=di_environment.project)
     )
-    assert _triple_count(GRAPH) == 2  # noqa: PLR2004
+    quads = list(QuadEntitySchema().from_entities(output).values)
+    assert len(quads) == 2  # noqa: PLR2004
 
 
 @needs_cmem
 def test_no_input(di_environment: FixtureEnvironmentData) -> None:
     """Test error when no input file is given"""
     with pytest.raises(ValueError, match=r"No input file was given\."):
-        SPARQLAnything(GRAPH, True).execute(
-            [], TestExecutionContext(project_id=di_environment.project)
-        )
+        SPARQLAnything().execute([], TestExecutionContext(project_id=di_environment.project))

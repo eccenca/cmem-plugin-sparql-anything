@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Changed
 
 - replaced the "File" dropdown parameter with a file input port
+- replaced the "Graph" / "Replace Graph" parameters and direct graph upload with a triple output port
 
 ### Added
 
