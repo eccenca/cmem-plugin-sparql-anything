@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Fixed
+
+- stopped passing `-Djava.security.manager -Djava.security.policy=...` to the sparql-anything
+  jar: the Security Manager API was permanently removed in JDK 24+ (JEP 486), so on hosts
+  running a current JDK the jar's JVM failed to start and its "Error occurred during
+  initialization of VM" message was fed to the RDF parser as if it were query output, causing
+  a `WorkflowExecutionException` for every execution
+
 ### Changed
 
 - replaced the "File" dropdown parameter with a file input port
@@ -13,6 +21,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - request N-Triples output from the sparql-anything jar instead of Turtle, and parse it
   accordingly, to avoid `BadSyntax` errors from prefixed names that Jena's Turtle writer and
   rdflib's Turtle parser disagree on
+- `_run_query` now also treats a non-zero jar exit code as an error, regardless of which
+  stream the error text was written to
 
 ### Added
 

@@ -36,7 +36,6 @@ from rdflib.term import Node
 from cmem_plugin_sparql_anything.constants import (
     DEFAULT_SPARQL,
     DOCUMENTATION,
-    POLICY_TEMPLATE,
     QUERY_PARAMETER_DESCRIPTION,
     SPARQL_ANYTHING_ERROR_PATTERN,
 )
@@ -130,31 +129,23 @@ class SPARQLAnything(WorkflowPlugin):
     def _run_query(self, resource: str) -> bytes:
         """Run the SPARQL Anything jar with the provided query and resource."""
         self.log.info("Start SPARQL Anything")
-        with (
-            tempfile.NamedTemporaryFile(suffix=".sparql", delete=True) as query_file,
-            tempfile.NamedTemporaryFile(suffix="anything.policy", delete=True) as policy_file,
-        ):
-            # Write policy content with proper resource file path
-            policy_file.write(POLICY_TEMPLATE.format(query_file.name, resource).encode("utf-8"))
-            policy_file.flush()
-
+        with tempfile.NamedTemporaryFile(suffix=".sparql", delete=True) as query_file:
             # Replace resource placeholder in query with actual file path
             query_file.write(
                 self.query.replace("{{resource_file}}", f"file://{resource}").encode("utf-8")
             )
             query_file.flush()
 
-            # Build command with policy and query file paths, requesting N-Triples output
-            # (a stricter, unambiguous serialization) instead of the default Turtle, since
-            # Jena's Turtle writer can produce prefixed names that rdflib's Turtle parser
-            # rejects (e.g. facade-x predicates derived from arbitrary source field names).
-            cmd = (
-                f"java -Djava.security.manager -Djava.security.policy={policy_file.name}"
-                f" -jar {get_path2jar()} -q {query_file.name} -f NT"
-            )
+            # Request N-Triples output (a stricter, unambiguous serialization) instead of the
+            # default Turtle, since Jena's Turtle writer can produce prefixed names that
+            # rdflib's Turtle parser rejects (e.g. facade-x predicates derived from arbitrary
+            # source field names).
+            cmd = f"java -jar {get_path2jar()} -q {query_file.name} -f NT"
             output: CompletedProcess = run(shlex.split(cmd), check=False, capture_output=True)  # noqa: S603
-        if SPARQL_ANYTHING_ERROR_PATTERN in output.stderr.decode("utf-8"):
-            error = output.stderr.decode("utf-8").partition(SPARQL_ANYTHING_ERROR_PATTERN)[2]
-            raise ValueError(f"{error}")
+
+        stderr = output.stderr.decode("utf-8")
+        if output.returncode != 0 or SPARQL_ANYTHING_ERROR_PATTERN in stderr:
+            error = stderr.partition(SPARQL_ANYTHING_ERROR_PATTERN)[2] or stderr
+            raise ValueError(error.strip() or output.stdout.decode("utf-8", errors="replace"))
 
         return output.stdout  # type: ignore[no-any-return]
