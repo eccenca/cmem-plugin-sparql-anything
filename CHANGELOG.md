@@ -18,6 +18,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   the still-compressed bytes (it reads the HTTP response's raw stream, bypassing
   Content-Encoding handling), so the jar was fed gzip binary instead of the file content,
   producing garbled triples
+- request the jar's results via `-o <file>` instead of reading stdout: JVM libraries used by
+  some triplifiers (e.g. Apache POI for Excel files, via Log4j2) can write bootstrap messages
+  straight to stdout when no logging provider is configured, which was mixed into the RDF
+  output and broke parsing (e.g. `.xlsx` inputs consistently failed with this)
 
 ### Changed
 

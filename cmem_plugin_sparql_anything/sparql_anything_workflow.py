@@ -130,23 +130,34 @@ class SPARQLAnything(WorkflowPlugin):
     def _run_query(self, resource: str) -> bytes:
         """Run the SPARQL Anything jar with the provided query and resource."""
         self.log.info("Start SPARQL Anything")
-        with tempfile.NamedTemporaryFile(suffix=".sparql", delete=True) as query_file:
-            # Replace resource placeholder in query with actual file path
-            query_file.write(
-                self.query.replace("{{resource_file}}", f"file://{resource}").encode("utf-8")
+        result_file = tempfile.NamedTemporaryFile(suffix=".nt", delete=False)  # noqa: SIM115
+        result_file.close()
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".sparql", delete=True) as query_file:
+                # Replace resource placeholder in query with actual file path
+                query_file.write(
+                    self.query.replace("{{resource_file}}", f"file://{resource}").encode("utf-8")
+                )
+                query_file.flush()
+
+                # Write results to a dedicated file (-o) instead of reading stdout: JVM
+                # libraries (e.g. Log4j2, when no logging provider is configured) can write
+                # bootstrap messages straight to stdout, which would otherwise get mixed into
+                # the RDF output. Request N-Triples (a stricter, unambiguous serialization)
+                # instead of the default Turtle, since Jena's Turtle writer can produce
+                # prefixed names that rdflib's Turtle parser rejects.
+                cmd = f"java -jar {get_path2jar()} -q {query_file.name} -f NT -o {result_file.name}"
+                output: CompletedProcess = run(  # noqa: S603
+                    shlex.split(cmd), check=False, capture_output=True
+                )
+
+            console_output = output.stdout.decode("utf-8", errors="replace") + output.stderr.decode(
+                "utf-8", errors="replace"
             )
-            query_file.flush()
+            if output.returncode != 0 or SPARQL_ANYTHING_ERROR_PATTERN in console_output:
+                error = console_output.partition(SPARQL_ANYTHING_ERROR_PATTERN)[2]
+                raise ValueError(error.strip() or console_output.strip())
 
-            # Request N-Triples output (a stricter, unambiguous serialization) instead of the
-            # default Turtle, since Jena's Turtle writer can produce prefixed names that
-            # rdflib's Turtle parser rejects (e.g. facade-x predicates derived from arbitrary
-            # source field names).
-            cmd = f"java -jar {get_path2jar()} -q {query_file.name} -f NT"
-            output: CompletedProcess = run(shlex.split(cmd), check=False, capture_output=True)  # noqa: S603
-
-        stderr = output.stderr.decode("utf-8")
-        if output.returncode != 0 or SPARQL_ANYTHING_ERROR_PATTERN in stderr:
-            error = stderr.partition(SPARQL_ANYTHING_ERROR_PATTERN)[2] or stderr
-            raise ValueError(error.strip() or output.stdout.decode("utf-8", errors="replace"))
-
-        return output.stdout  # type: ignore[no-any-return]
+            return Path(result_file.name).read_bytes()
+        finally:
+            Path(result_file.name).unlink(missing_ok=True)
