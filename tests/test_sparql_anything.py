@@ -4,6 +4,7 @@ import io
 import os
 from collections.abc import Generator
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
 from cmem.cmempy.workspace.projects.datasets.dataset import make_new_dataset
@@ -26,6 +27,8 @@ PROJECT_NAME = "sparql_anything_test_project"
 DATASET_NAME = "sample_dataset"
 RESOURCE_NAME = "sample_dataset.txt"
 DATASET_TYPE = "text"
+XLSX_RESOURCE_NAME = "sample.xlsx"
+FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 @dataclass
@@ -79,3 +82,30 @@ def test_no_input(di_environment: FixtureEnvironmentData) -> None:
     """Test error when no input file is given"""
     with pytest.raises(ValueError, match=r"No input file was given\."):
         SPARQLAnything().execute([], TestExecutionContext(project_id=di_environment.project))
+
+
+@needs_cmem
+def test_success_with_xlsx(di_environment: FixtureEnvironmentData) -> None:
+    """Test SPARQLAnything against an Excel file.
+
+    Regression test: some triplifiers (e.g. Excel, via Apache POI) pull in JVM libraries that
+    can write bootstrap diagnostics straight to stdout (e.g. a Log4j2 "no logging provider"
+    warning), which used to get mixed into the RDF output read from stdout and break parsing.
+    """
+    with (FIXTURES_DIR / XLSX_RESOURCE_NAME).open("rb") as xlsx_file:
+        create_resource(
+            project_name=di_environment.project,
+            resource_name=XLSX_RESOURCE_NAME,
+            file_resource=xlsx_file,
+            replace=True,
+        )
+
+    schema = FileEntitySchema()
+    entity = schema.to_entity(ProjectFile(path=XLSX_RESOURCE_NAME))
+    input_entities = Entities(entities=iter([entity]), schema=schema)
+
+    output = SPARQLAnything().execute(
+        [input_entities], TestExecutionContext(project_id=di_environment.project)
+    )
+    quads = list(QuadEntitySchema().from_entities(output).values)
+    assert len(quads) == 13  # noqa: PLR2004
