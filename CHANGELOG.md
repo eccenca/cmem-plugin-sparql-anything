@@ -13,6 +13,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   running a current JDK the jar's JVM failed to start and its "Error occurred during
   initialization of VM" message was fed to the RDF parser as if it were query output, causing
   a `WorkflowExecutionException` for every execution
+- download the file via `File.read_bytes()` instead of manually copying `read_stream()`
+  chunks: for project resources served with `Content-Encoding: gzip`, `read_stream()` returns
+  the still-compressed bytes (it reads the HTTP response's raw stream, bypassing
+  Content-Encoding handling), so the jar was fed gzip binary instead of the file content,
+  producing garbled triples
 
 ### Changed
 

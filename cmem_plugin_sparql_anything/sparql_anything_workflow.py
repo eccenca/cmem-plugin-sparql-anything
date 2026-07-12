@@ -109,9 +109,10 @@ class SPARQLAnything(WorkflowPlugin):
     def _download_resource(self, project_id: str, file: File, target: IO[bytes]) -> None:
         """Download the resource and writes it to the temporary file."""
         self.log.info("Downloading resource")
-        with file.read_stream(project_id) as stream:
-            for chunk in iter(lambda: stream.read(8192), b""):
-                target.write(chunk)
+        # Use read_bytes (not read_stream) since it transparently decompresses gzip-encoded
+        # responses; ProjectFile.read_stream() returns the raw, still-compressed bytes because
+        # it reads from the response's raw stream, bypassing HTTP Content-Encoding handling.
+        target.write(file.read_bytes(project_id))
         target.flush()
 
     @staticmethod
