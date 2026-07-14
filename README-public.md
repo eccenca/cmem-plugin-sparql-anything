@@ -12,6 +12,16 @@ cmemc admin workspace python install cmem-plugin-sparql-anything
 [![workflow](https://github.com/eccenca/cmem-plugin-sparql-anything/actions/workflows/check.yml/badge.svg)](https://github.com/eccenca/cmem-plugin-sparql-anything/actions) [![pypi version](https://img.shields.io/pypi/v/cmem-plugin-sparql-anything)](https://pypi.org/project/cmem-plugin-sparql-anything) [![license](https://img.shields.io/pypi/l/cmem-plugin-sparql-anything)](https://pypi.org/project/cmem-plugin-sparql-anything)
 [![poetry][poetry-shield]][poetry-link] [![ruff][ruff-shield]][ruff-link] [![mypy][mypy-shield]][mypy-link] [![copier][copier-shield]][copier] 
 
+## Ports
+
+- **Input (required):** a single file, provided by an upstream workflow task via a file input
+  port (`FileEntitySchema`). Connect a task that emits one file, such as a resource dataset or
+  another file-producing plugin, and reference it in the query with the `{{resource_file}}`
+  placeholder.
+- **Output:** the RDF triples constructed by the SPARQL query, emitted via a triple output port
+  (`QuadEntitySchema`). Connect a downstream task (e.g. a graph dataset) to persist or further
+  process the result.
+
 [cmem-link]: https://documentation.eccenca.com
 [cmem-shield]: https://img.shields.io/endpoint?url=https://dev.documentation.eccenca.com/badge.json
 [poetry-link]: https://python-poetry.org/

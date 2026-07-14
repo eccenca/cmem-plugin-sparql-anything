@@ -4,14 +4,17 @@ import io
 import os
 from collections.abc import Generator
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
-from cmem.cmempy.queries import SparqlQuery
 from cmem.cmempy.workspace.projects.datasets.dataset import make_new_dataset
 from cmem.cmempy.workspace.projects.project import delete_project, make_new_project
 from cmem.cmempy.workspace.projects.resources.resource import (
     create_resource,
 )
+from cmem_plugin_base.dataintegration.entity import Entities
+from cmem_plugin_base.dataintegration.typed_entities.file import FileEntitySchema, ProjectFile
+from cmem_plugin_base.dataintegration.typed_entities.quads import QuadEntitySchema
 from cmem_plugin_base.testing import TestExecutionContext
 
 from cmem_plugin_sparql_anything.sparql_anything_workflow import SPARQLAnything
@@ -24,12 +27,8 @@ PROJECT_NAME = "sparql_anything_test_project"
 DATASET_NAME = "sample_dataset"
 RESOURCE_NAME = "sample_dataset.txt"
 DATASET_TYPE = "text"
-GRAPH = "https://example.org/graph/"
-TRIPLE_COUNT_QUERY = """SELECT (COUNT(*) as ?Triples)
-WHERE
-  { GRAPH <{{graph}}>
-      { ?s ?p ?o }
-  }"""
+XLSX_RESOURCE_NAME = "sample.xlsx"
+FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 @dataclass
@@ -64,29 +63,49 @@ def di_environment() -> Generator[FixtureEnvironmentData]:
     delete_project(PROJECT_NAME)
 
 
-def _triple_count(graph: str) -> int:
-    """Count the no of triple in graph"""
-    query = SparqlQuery(
-        TRIPLE_COUNT_QUERY,
-        label="query from string to get triples count metadata",
-        origin="unknown",
-        placeholder={
-            "graph": graph,
-        },
-    )
-    result = query.get_json_results(
-        placeholder={
-            "graph": graph,
-        }
-    )
-    count = result["results"]["bindings"][0]["Triples"]["value"]
-    return int(count)
-
-
 @needs_cmem
 def test_success(di_environment: FixtureEnvironmentData) -> None:
     """Test SPARQLAnything success flow"""
-    SPARQLAnything(di_environment.resource, GRAPH, True).execute(
-        [], TestExecutionContext(project_id=di_environment.project)
+    schema = FileEntitySchema()
+    entity = schema.to_entity(ProjectFile(path=di_environment.resource))
+    input_entities = Entities(entities=iter([entity]), schema=schema)
+
+    output = SPARQLAnything().execute(
+        [input_entities], TestExecutionContext(project_id=di_environment.project)
     )
-    assert _triple_count(GRAPH) == 2  # noqa: PLR2004
+    quads = list(QuadEntitySchema().from_entities(output).values)
+    assert len(quads) == 2  # noqa: PLR2004
+
+
+@needs_cmem
+def test_no_input(di_environment: FixtureEnvironmentData) -> None:
+    """Test error when no input file is given"""
+    with pytest.raises(ValueError, match=r"No input file was given\."):
+        SPARQLAnything().execute([], TestExecutionContext(project_id=di_environment.project))
+
+
+@needs_cmem
+def test_success_with_xlsx(di_environment: FixtureEnvironmentData) -> None:
+    """Test SPARQLAnything against an Excel file.
+
+    Regression test: some triplifiers (e.g. Excel, via Apache POI) pull in JVM libraries that
+    can write bootstrap diagnostics straight to stdout (e.g. a Log4j2 "no logging provider"
+    warning), which used to get mixed into the RDF output read from stdout and break parsing.
+    """
+    with (FIXTURES_DIR / XLSX_RESOURCE_NAME).open("rb") as xlsx_file:
+        create_resource(
+            project_name=di_environment.project,
+            resource_name=XLSX_RESOURCE_NAME,
+            file_resource=xlsx_file,
+            replace=True,
+        )
+
+    schema = FileEntitySchema()
+    entity = schema.to_entity(ProjectFile(path=XLSX_RESOURCE_NAME))
+    input_entities = Entities(entities=iter([entity]), schema=schema)
+
+    output = SPARQLAnything().execute(
+        [input_entities], TestExecutionContext(project_id=di_environment.project)
+    )
+    quads = list(QuadEntitySchema().from_entities(output).values)
+    assert len(quads) == 13  # noqa: PLR2004

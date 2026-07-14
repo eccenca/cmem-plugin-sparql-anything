@@ -5,18 +5,17 @@ from pathlib import Path
 
 import requests
 
-JAR_VERSION = "0.9.0"
+JAR_VERSION = "v1.1.0"
 JAR_FILE_NAME = f"sparql-anything-{JAR_VERSION}.jar"
 
 
 def has_jar() -> bool:
-    """Check the jar has been successfully downloaded in the installation folder."""
-    files = Path(get_module_path()).iterdir()
-    return any(".jar" in file.name for file in files)
+    """Check the jar for the current version is present in the installation folder."""
+    return (Path(get_module_path()) / JAR_FILE_NAME).is_file()
 
 
 def get_jar_artifact_uri() -> str:
-    """Retrieve the download url for latest SPARQL Anything release."""
+    """Retrieve the download url for the pinned SPARQL Anything release (JAR_VERSION)."""
     return f"https://download.eccenca.com/cmem-plugin-sparql-anything/sparql-anything-{JAR_VERSION}.jar"
 
 

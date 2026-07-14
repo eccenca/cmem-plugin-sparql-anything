@@ -2,29 +2,6 @@
 
 from cmem_plugin_base.dataintegration.parameter.code import SparqlCode
 
-POLICY_TEMPLATE = """
-grant {{
-permission java.util.PropertyPermission "user.dir", "read";
-permission java.util.PropertyPermission "http://jena.hpl.hp.com/2004/07/feature/noSecurity", "read";
-permission java.util.PropertyPermission "http://jena.hpl.hp.com/2004/07/feature/noCharset", "read";
-permission java.util.PropertyPermission "http://jena.hpl.hp.com/2004/08/LocationMap", "read";
-permission java.util.PropertyPermission "LocationMap", "read";
-permission java.util.PropertyPermission "org.apache.jena.tdb.settings", "read";
-permission java.util.PropertyPermission "tdb:settings", "read";
-permission java.util.PropertyPermission "sun.arch.data.model", "read";
-permission java.util.PropertyPermission "*", "read,write";
-permission java.lang.RuntimePermission "getenv.TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT";
-permission java.io.FilePermission "location-mapping.ttl", "read";
-permission java.io.FilePermission "etc/location-mapping.ttl", "read";
-permission java.io.FilePermission "etc/location-mapping.rdf", "read";
-permission java.io.FilePermission "location-mapping.rdf", "read";
-
-permission java.io.FilePermission "{}", "read";
-permission java.io.FilePermission "{}", "read";
-
-}};
-"""
-
 DEFAULT_SPARQL = SparqlCode("""PREFIX fx: <http://sparql.xyz/facade-x/ns/>
 CONSTRUCT { ?s ?p ?o }
 WHERE
@@ -39,7 +16,7 @@ WHERE
 QUERY_PARAMETER_DESCRIPTION = f"""
 Query to run with sparql-anything engine.
 
-Note: resource_file place holder will be replaced with selected resource file.
+Note: resource_file place holder will be replaced with the file received on the input port.
 
 Example
 ```
@@ -56,6 +33,12 @@ re-engineering that allows users to ... query anything with SPARQL.
 This workflow task allows for execution of SPARQL queries against the simplistic Facade-X
 meta-model of SPARQL Anything.
 Facade-X provides a homogeneous view over heterogeneous data sources and support multiple formats.
-It allows to extract data from project files by using SPARQL Construct queries.
-In order to reference, the file, you need to use the `{{resource_file}}` placeholder.
+It allows to extract data from a file by using SPARQL Construct queries.
+
+The file to query is received via an input port (connect an upstream task that emits a single
+file). In order to reference the file in the query, you need to use the `{{resource_file}}`
+placeholder.
+
+The constructed triples are emitted via an output port, so a downstream task decides what to do
+with the result (e.g. write it to a graph).
 """

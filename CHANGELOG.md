@@ -6,6 +6,33 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Fixed
+
+- stopped passing `-Djava.security.manager -Djava.security.policy=...` to the sparql-anything
+  jar: the Security Manager API was permanently removed in JDK 24+ (JEP 486), so on hosts
+  running a current JDK the jar's JVM failed to start and its "Error occurred during
+  initialization of VM" message was fed to the RDF parser as if it were query output, causing
+  a `WorkflowExecutionException` for every execution
+- download the file via `File.read_bytes()` instead of manually copying `read_stream()`
+  chunks: for project resources served with `Content-Encoding: gzip`, `read_stream()` returns
+  the still-compressed bytes (it reads the HTTP response's raw stream, bypassing
+  Content-Encoding handling), so the jar was fed gzip binary instead of the file content,
+  producing garbled triples
+- request the jar's results via `-o <file>` instead of reading stdout: JVM libraries used by
+  some triplifiers (e.g. Apache POI for Excel files, via Log4j2) can write bootstrap messages
+  straight to stdout when no logging provider is configured, which was mixed into the RDF
+  output and broke parsing (e.g. `.xlsx` inputs consistently failed with this)
+
+### Changed
+
+- replaced the "File" dropdown parameter with a file input port
+- replaced the "Graph" / "Replace Graph" parameters and direct graph upload with a triple output port
+- request N-Triples output from the sparql-anything jar instead of Turtle, and parse it
+  accordingly, to avoid `BadSyntax` errors from prefixed names that Jena's Turtle writer and
+  rdflib's Turtle parser disagree on
+- `_run_query` now also treats a non-zero jar exit code as an error, regardless of which
+  stream the error text was written to
+
 ### Added
 
 - initial version
