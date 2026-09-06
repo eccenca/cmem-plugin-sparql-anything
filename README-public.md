@@ -4,7 +4,7 @@ Query anything with SPARQL to construct Knowledge Graphs.
 
 [![eccenca Corporate Memory][cmem-shield]][cmem-link]
 
-This is a plugin for [eccenca](https://eccenca.com) [Corporate Memory](https://documentation.eccenca.com). You can install it with the [cmemc](https://eccenca.com/go/cmemc) command line client like this:
+This is a plugin for [eccenca Corporate Memory](https://documentation.eccenca.com). You can install it with the [cmemc](https://eccenca.com/go/cmemc) command line client like this:
 
 ```
 cmemc admin workspace python install cmem-plugin-sparql-anything
@@ -23,7 +23,7 @@ cmemc admin workspace python install cmem-plugin-sparql-anything
   process the result.
 
 [cmem-link]: https://documentation.eccenca.com
-[cmem-shield]: https://img.shields.io/endpoint?url=https://dev.documentation.eccenca.com/badge.json
+[cmem-shield]: https://img.shields.io/endpoint?url=https://documentation.eccenca.com/latest/badge.json
 [poetry-link]: https://python-poetry.org/
 [poetry-shield]: https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json
 [ruff-link]: https://docs.astral.sh/ruff/
