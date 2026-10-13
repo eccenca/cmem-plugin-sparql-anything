@@ -74,7 +74,7 @@ def test_success(di_environment: FixtureEnvironmentData) -> None:
         [input_entities], TestExecutionContext(project_id=di_environment.project)
     )
     quads = list(QuadEntitySchema().from_entities(output).values)
-    assert len(quads) == 2  # noqa: PLR2004
+    assert len(quads) == 2
 
 
 @needs_cmem
@@ -108,4 +108,4 @@ def test_success_with_xlsx(di_environment: FixtureEnvironmentData) -> None:
         [input_entities], TestExecutionContext(project_id=di_environment.project)
     )
     quads = list(QuadEntitySchema().from_entities(output).values)
-    assert len(quads) == 13  # noqa: PLR2004
+    assert len(quads) == 13

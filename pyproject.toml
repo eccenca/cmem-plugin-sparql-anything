@@ -103,6 +103,7 @@ ignore = [
     "ISC001",  # single-line-implicit-string-concatenation
     "PD",      # opinionated linting for pandas code
     "TRY003",  # Avoid specifying long messages outside the exception class
+    "TRY400",  # PluginLogger has no exception(), so error() is the only option
 ]
 
 [tool.deptry.per_rule_ignores]
@@ -111,4 +112,5 @@ DEP003 = ["cmem"]
 "tests/**/*.py" = [
     "S101",    # asserts allowed in tests
     "ARG",     # unused function args (pytest fixtures)
+    "PLR2004", # in an assertion the expected value is the literal
 ]
